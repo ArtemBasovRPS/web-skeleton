@@ -12,6 +12,40 @@ const buildPath = path.join(__dirname, './build');
 const imgPath = path.join(__dirname, './src/assets/img');
 const srcPath = path.join(__dirname, './src');
 
+const entry = {
+  app: './index.js',
+  vendor: [
+    'react', 'react-dom', 'react-router'
+  ]
+}
+
+const confOptionForHMR = [
+  'react-hot-loader/patch',
+  'webpack-dev-server/client?http://localhost:3000',
+  'webpack/hot/only-dev-server'
+];
+
+const rules = [
+  { test: /\.(js|jsx)$/, 
+    include: path.join(__dirname, "src"),
+    exclude: /node_modules/, 
+    loader: isProduction ? 'babel-loader' : ['react-hot-loader/webpack', 'babel-loader']
+  },
+  {
+    test: /\.(png|gif|jpg|svg)$/,
+    include: imgPath,
+    use: 'url-loader?limit=20480&name=assets/[name]-[hash].[ext]',
+  },
+  {
+    test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+    loader: "url-loader"
+  },
+  {
+    test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+    loader: "file-loader"
+  }
+];
+
 const plugins = [
   new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
@@ -23,7 +57,6 @@ const plugins = [
       NODE_ENV: JSON.stringify(nodeEnv),
     },
   }),
-  new webpack.NamedModulesPlugin(),
   new HtmlWebpackPlugin({
     template: path.join(srcPath, 'index.html'),
     path: buildPath,
@@ -45,36 +78,6 @@ const plugins = [
   }),
   new webpack.NoEmitOnErrorsPlugin(),
 ];
-
-const rules = [
-  { test: /\.(js|jsx)$/, exclude: /node_modules/, loader: ['react-hot-loader/webpack', 'babel-loader']},
-  {
-    test: /\.(png|gif|jpg|svg)$/,
-    include: imgPath,
-    use: 'url-loader?limit=20480&name=assets/[name]-[hash].[ext]',
-  },
-];
-
-const entry = isProduction 
-  ? 
-    {
-      app: './index.js',
-      vendor: [
-        'react', 'react-dom', 'react-router',
-      ]
-    }
-  : 
-    {
-      app: [
-        './index.js'
-      ],
-      vendor: [
-        'react', 'react-dom', 'react-router',
-        'react-hot-loader/patch',
-        'webpack-dev-server/client?http://localhost:3000',
-        'webpack/hot/only-dev-server',
-      ]
-    };
 
 if (isProduction) {
   plugins.push(
@@ -106,7 +109,7 @@ if (isProduction) {
   rules.push(
     {
       test: /\.scss$/,
-      exclude: /node_modules/,
+      include: path.join(__dirname, "src"),
       use: ExtractTextPlugin.extract({
         fallback: 'style-loader',
         use: ['css-loader', 'sass-loader']
@@ -115,13 +118,14 @@ if (isProduction) {
   );
 } else {
   plugins.push(
+    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin()
   );
 
   rules.push(
     {
       test: /\.scss$/,
-      exclude: /node_modules/,
+      include: path.join(__dirname, "src"),
       use: [
         'style-loader',
         'css-loader',
@@ -129,6 +133,7 @@ if (isProduction) {
       ],
     }
   );
+  entry.vendor = [...entry.vendor, ...confOptionForHMR];
 }
 
 module.exports = {
