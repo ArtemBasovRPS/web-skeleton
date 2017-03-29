@@ -17,7 +17,7 @@ const entry = {
   vendor: [
     'react', 'react-dom', 'react-router'
   ]
-}
+};
 
 const confOptionForHMR = [
   'react-hot-loader/patch',
@@ -143,6 +143,7 @@ module.exports = {
   output: {
     path: buildPath,
     filename: 'app-[hash].js',
+    publicPath: '/'
   },
   module: {
     rules,

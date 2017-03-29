@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import { Link, browserHistory } from 'react-router';
 
+import './menu.scss';
+
 class Menu extends Component {
   constructor() {
     super()
@@ -15,8 +17,8 @@ class Menu extends Component {
 
   render() {
     return (
-      <div>
-        <Link onClick={this.handleClick} to='/home' activeStyle={{color:'#53acff'}} style={{marginRight: '30px'}}>Home</Link>
+      <div className="menu">
+        <Link onClick={this.handleClick} to='/home' activeStyle={{color:'#53acff'}} >Home</Link>
         <Link onClick={this.handleClick} to='/about' activeStyle={{color:'#53acff'}} >About</Link>
       </div>
     )
